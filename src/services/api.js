@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_URL =
   process.env.EXPO_PUBLIC_API_URL ||
-  "http://192.168.101.70:3000";
+  "http://192.168.100.137:3000";
 
 export async function apiRequest(endpoint, options = {}) {
   const token = await AsyncStorage.getItem("shopfeel_token");
