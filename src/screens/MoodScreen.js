@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
   Text,
@@ -17,6 +18,7 @@ import { colors } from "../theme";
 export default function MoodScreen({ navigation, route }) {
   const [moods, setMoods] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDescriptions, setShowDescriptions] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -27,8 +29,16 @@ export default function MoodScreen({ navigation, route }) {
   async function loadMoods() {
     try {
       setLoading(true);
-      const data = await apiRequest("/api/mobile/moods");
+      const [data, savedDescriptions] = await Promise.all([
+        apiRequest("/api/mobile/moods"),
+        AsyncStorage.getItem("shopfeel_show_mood_descriptions"),
+      ]);
+
       setMoods(data.moods || []);
+
+      if (savedDescriptions !== null) {
+        setShowDescriptions(savedDescriptions === "true");
+      }
     } finally {
       setLoading(false);
     }
@@ -85,7 +95,7 @@ export default function MoodScreen({ navigation, route }) {
 
                   <Text style={styles.name}>{mood.mood_name}</Text>
 
-                  {!!mood.description && (
+                  {showDescriptions && !!mood.description && (
                     <Text style={styles.description} numberOfLines={2}>
                       {mood.description}
                     </Text>
