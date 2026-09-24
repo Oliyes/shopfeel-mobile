@@ -9,10 +9,12 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiRequest } from "../services/api";
+import BrandLogo from "../components/BrandLogo";
 import { colors } from "../theme";
 
 export default function RegisterScreen({ navigation }) {
@@ -77,7 +79,14 @@ export default function RegisterScreen({ navigation }) {
             <Text style={styles.back}>‹ Voltar</Text>
           </TouchableOpacity>
 
-          <Text style={styles.kicker}>BEM-VINDA AO SHOPFEEL</Text>
+          <View style={styles.brandRow}>
+            <BrandLogo size={58} compact />
+            <View>
+              <Text style={styles.brandName}>Shopfeel</Text>
+              <Text style={styles.brandText}>Sua experiência começa aqui.</Text>
+            </View>
+          </View>
+
           <Text style={styles.title}>Crie sua conta</Text>
           <Text style={styles.subtitle}>
             Descubra produtos que combinam com o seu momento.
@@ -149,10 +158,25 @@ export default function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   container: { flexGrow: 1, padding: 24, paddingBottom: 40 },
-  back: { color: colors.goldDark, fontSize: 15, marginBottom: 32 },
-  kicker: { color: colors.goldDark, fontSize: 10, letterSpacing: 2, marginBottom: 8 },
-  title: { color: colors.text, fontSize: 36, fontFamily: "Georgia", marginBottom: 8 },
-  subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginBottom: 30 },
+  back: { color: colors.goldDark, fontSize: 15, marginBottom: 24 },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 13,
+    marginBottom: 26,
+  },
+  brandName: {
+    fontSize: 22,
+    fontFamily: "Georgia",
+    color: colors.text,
+  },
+  brandText: {
+    color: colors.muted,
+    fontSize: 11,
+    marginTop: 2,
+  },
+  title: { color: colors.text, fontSize: 35, fontFamily: "Georgia", marginBottom: 8 },
+  subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginBottom: 28 },
   label: { color: colors.text, fontSize: 12, marginBottom: 7, marginTop: 4 },
   input: {
     height: 54,
@@ -167,12 +191,12 @@ const styles = StyleSheet.create({
   button: {
     height: 56,
     borderRadius: 14,
-    backgroundColor: colors.gold,
+    backgroundColor: "#55A86B",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
   },
   buttonText: { color: colors.white, fontWeight: "700", fontSize: 15 },
   loginText: { textAlign: "center", marginTop: 24, color: colors.muted, fontSize: 13 },
-  link: { color: colors.goldDark, fontWeight: "700" },
+  link: { color: "#9B5DE5", fontWeight: "700" },
 });
