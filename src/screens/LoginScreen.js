@@ -9,10 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiRequest } from "../services/api";
+import BrandLogo from "../components/BrandLogo";
 import { colors } from "../theme";
 
 export default function LoginScreen({ navigation }) {
@@ -69,8 +71,11 @@ export default function LoginScreen({ navigation }) {
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.kicker}>SHOPFEEL</Text>
-          <Text style={styles.logo}>Shopfeel</Text>
+          <View style={styles.brand}>
+            <BrandLogo size={94} />
+            <Text style={styles.logoText}>Shopfeel</Text>
+            <Text style={styles.tagline}>Sinta. Escolha. Descubra.</Text>
+          </View>
 
           <Text style={styles.title}>Bem-vinda de volta.</Text>
           <Text style={styles.subtitle}>
@@ -122,8 +127,6 @@ export default function LoginScreen({ navigation }) {
           >
             <Text style={styles.createText}>Criar uma conta</Text>
           </TouchableOpacity>
-
-          <Text style={styles.footer}>Mais que compras, bem-estar.</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -136,31 +139,32 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     padding: 26,
-    paddingVertical: 40,
+    paddingVertical: 38,
   },
-  kicker: {
-    color: colors.goldDark,
-    fontSize: 10,
-    letterSpacing: 3,
-    textAlign: "center",
+  brand: {
+    alignItems: "center",
+    marginBottom: 34,
   },
-  logo: {
+  logoText: {
+    fontSize: 34,
     color: colors.text,
-    fontSize: 41,
     fontFamily: "Georgia",
-    textAlign: "center",
-    marginTop: 6,
-    marginBottom: 48,
+    marginTop: 8,
+  },
+  tagline: {
+    color: colors.muted,
+    fontSize: 11,
+    marginTop: 3,
   },
   title: {
-    fontSize: 30,
+    fontSize: 29,
     fontFamily: "Georgia",
     color: colors.text,
   },
   subtitle: {
     color: colors.muted,
-    marginTop: 9,
-    marginBottom: 28,
+    marginTop: 8,
+    marginBottom: 26,
     lineHeight: 20,
   },
   label: {
@@ -187,7 +191,7 @@ const styles = StyleSheet.create({
   button: {
     height: 56,
     borderRadius: 14,
-    backgroundColor: colors.gold,
+    backgroundColor: "#9B5DE5",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -200,19 +204,13 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: colors.gold,
+    borderColor: "#55B7D9",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 12,
   },
   createText: {
-    color: colors.goldDark,
+    color: "#397F99",
     fontWeight: "700",
-  },
-  footer: {
-    textAlign: "center",
-    marginTop: 34,
-    color: colors.muted,
-    fontSize: 11,
   },
 });
