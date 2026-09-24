@@ -204,7 +204,11 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
         </ScrollView>
 
-        <BottomNav navigation={navigation} active="Profile" />
+        <BottomNav
+          navigation={navigation}
+          active="Profile"
+          profilePhoto={user?.photo}
+        />
       </View>
     </SafeAreaView>
   );
