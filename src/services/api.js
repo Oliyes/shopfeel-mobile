@@ -1,16 +1,35 @@
-const API_URL = "http://192.168.101.70:3000";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  "http://192.168.101.70:3000";
 
 export async function apiRequest(endpoint, options = {}) {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
+  const token = await AsyncStorage.getItem("shopfeel_token");
 
+  const response = await fetch(API_URL + endpoint, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: "Bearer " + token } : {}),
       ...options.headers,
     },
   });
 
-  const data = await response.json().catch(() => null);
+  if (response.status === 204) {
+    return null;
+  }
+
+  const text = await response.text();
+  let data = null;
+
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+  }
 
   if (!response.ok) {
     throw new Error(
