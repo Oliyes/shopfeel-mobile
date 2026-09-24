@@ -11,7 +11,15 @@ export default function SplashScreen({ navigation }) {
       const savedUser = await AsyncStorage.getItem("shopfeel_user");
 
       if (token && savedUser) {
-        navigation.replace("Home", {
+        const savedStartScreen =
+          await AsyncStorage.getItem("shopfeel_start_screen");
+
+        const startScreen =
+          savedStartScreen === "Mood"
+            ? "Mood"
+            : "Home";
+
+        navigation.replace(startScreen, {
           user: JSON.parse(savedUser),
         });
       } else {
