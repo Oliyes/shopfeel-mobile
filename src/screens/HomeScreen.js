@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -9,9 +9,11 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import { apiRequest } from "../services/api";
-import { getMoodEmoji } from "../utils/moods";
+import { getMoodEmoji, getMoodColor, getMoodSoftColor } from "../utils/moods";
 import BottomNav from "../components/BottomNav";
+import BrandLogo from "../components/BrandLogo";
 import { colors } from "../theme";
 
 export default function HomeScreen({ route, navigation }) {
@@ -19,9 +21,11 @@ export default function HomeScreen({ route, navigation }) {
   const [moods, setMoods] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadHome();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadHome();
+    }, [])
+  );
 
   async function loadHome() {
     try {
@@ -53,11 +57,15 @@ export default function HomeScreen({ route, navigation }) {
       <View style={styles.page}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.header}>
-            <View>
-              <Text style={styles.kicker}>SHOPFEEL</Text>
-              <Text style={styles.greeting}>
-                {firstName ? "Olá, " + firstName + "." : "Olá."}
-              </Text>
+            <View style={styles.brandWrap}>
+              <BrandLogo size={44} compact />
+
+              <View>
+                <Text style={styles.kicker}>SHOPFEEL</Text>
+                <Text style={styles.greeting}>
+                  {firstName ? "Olá, " + firstName + "." : "Olá."}
+                </Text>
+              </View>
             </View>
 
             <TouchableOpacity
@@ -71,6 +79,12 @@ export default function HomeScreen({ route, navigation }) {
           </View>
 
           <View style={styles.hero}>
+            <View style={styles.heroDots}>
+              {["#F4B942","#55A86B","#55B7D9","#5B7FC7","#9B5DE5","#E768A2"].map((color) => (
+                <View key={color} style={[styles.heroDot, { backgroundColor: color }]} />
+              ))}
+            </View>
+
             <Text style={styles.heroEyebrow}>SEU HUMOR, SUA ESCOLHA</Text>
             <Text style={styles.heroTitle}>
               Como você está se sentindo hoje?
@@ -90,36 +104,48 @@ export default function HomeScreen({ route, navigation }) {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionLabel}>HUMORES</Text>
 
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Mood", { user })}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate("Mood", { user })}>
               <Text style={styles.seeAll}>Ver todos</Text>
             </TouchableOpacity>
           </View>
 
           {loading ? (
-            <ActivityIndicator color={colors.gold} />
+            <ActivityIndicator color="#9B5DE5" />
           ) : (
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.moodRow}
             >
-              {moods.map((mood) => (
-                <TouchableOpacity
-                  key={mood.id}
-                  style={styles.moodCard}
-                  onPress={() => openMood(mood)}
-                >
-                  <Text style={styles.moodEmoji}>
-                    {getMoodEmoji(mood.mood_name)}
-                  </Text>
+              {moods.map((mood) => {
+                const moodColor = getMoodColor(mood);
 
-                  <Text style={styles.moodName} numberOfLines={2}>
-                    {mood.mood_name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                return (
+                  <TouchableOpacity
+                    key={mood.id}
+                    style={[
+                      styles.moodCard,
+                      {
+                        borderColor: moodColor,
+                        backgroundColor: getMoodSoftColor(mood),
+                      },
+                    ]}
+                    onPress={() => openMood(mood)}
+                  >
+                    <View style={[styles.moodIconCircle, { backgroundColor: moodColor }]}>
+                      <Text style={styles.moodEmoji}>
+                        {getMoodEmoji(mood.mood_name)}
+                      </Text>
+                    </View>
+
+                    <Text style={styles.moodName} numberOfLines={2}>
+                      {mood.mood_name}
+                    </Text>
+
+                    <View style={[styles.colorLine, { backgroundColor: moodColor }]} />
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
           )}
 
@@ -127,10 +153,10 @@ export default function HomeScreen({ route, navigation }) {
 
           <View style={styles.shortcuts}>
             <TouchableOpacity
-              style={styles.shortcut}
+              style={[styles.shortcut, styles.searchShortcut]}
               onPress={() => navigation.navigate("Search")}
             >
-              <Text style={styles.shortcutIcon}>⌕</Text>
+              <Text style={[styles.shortcutIcon, { color: "#55B7D9" }]}>⌕</Text>
               <Text style={styles.shortcutTitle}>Pesquisar</Text>
               <Text style={styles.shortcutText}>
                 Encontre um produto pelo nome.
@@ -138,10 +164,10 @@ export default function HomeScreen({ route, navigation }) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.shortcut}
+              style={[styles.shortcut, styles.favoriteShortcut]}
               onPress={() => navigation.navigate("Favorites")}
             >
-              <Text style={styles.shortcutIcon}>♡</Text>
+              <Text style={[styles.shortcutIcon, { color: "#E768A2" }]}>♡</Text>
               <Text style={styles.shortcutTitle}>Favoritos</Text>
               <Text style={styles.shortcutText}>
                 Reveja o que você mais gostou.
@@ -166,25 +192,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 24,
   },
-  kicker: { color: colors.goldDark, fontSize: 9, letterSpacing: 2 },
+  brandWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+  },
+  kicker: { color: "#9B5DE5", fontSize: 9, letterSpacing: 2 },
   greeting: {
     color: colors.text,
-    fontSize: 27,
+    fontSize: 25,
     fontFamily: "Georgia",
-    marginTop: 4,
+    marginTop: 2,
   },
   profileCircle: {
     width: 43,
     height: 43,
     borderRadius: 22,
-    backgroundColor: "#EFE2CF",
+    backgroundColor: "#F1E8FA",
     borderWidth: 1,
-    borderColor: "#DEC6A1",
+    borderColor: "#D8C4EF",
     alignItems: "center",
     justifyContent: "center",
   },
   profileLetter: {
-    color: colors.goldDark,
+    color: "#7B4AB5",
     fontSize: 17,
     fontFamily: "Georgia",
   },
@@ -193,8 +224,19 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 24,
     marginBottom: 28,
+    overflow: "hidden",
   },
-  heroEyebrow: { color: "#D9B77A", fontSize: 9, letterSpacing: 1.8 },
+  heroDots: {
+    flexDirection: "row",
+    gap: 6,
+    marginBottom: 16,
+  },
+  heroDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  heroEyebrow: { color: "#F4B942", fontSize: 9, letterSpacing: 1.8 },
   heroTitle: {
     color: colors.white,
     fontSize: 28,
@@ -210,7 +252,7 @@ const styles = StyleSheet.create({
   },
   heroButton: {
     alignSelf: "flex-start",
-    backgroundColor: colors.gold,
+    backgroundColor: "#9B5DE5",
     borderRadius: 12,
     paddingHorizontal: 18,
     paddingVertical: 13,
@@ -224,35 +266,51 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionLabel: {
-    color: colors.goldDark,
+    color: colors.text,
     fontSize: 10,
     letterSpacing: 1.6,
     marginBottom: 12,
+    fontWeight: "700",
   },
-  seeAll: { color: colors.muted, fontSize: 11, marginBottom: 12 },
+  seeAll: { color: "#9B5DE5", fontSize: 11, marginBottom: 12 },
   moodRow: { gap: 10, paddingRight: 20, marginBottom: 28 },
   moodCard: {
-    width: 105,
-    height: 112,
+    width: 112,
+    height: 124,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 18,
-    backgroundColor: colors.surface,
+    borderRadius: 20,
     padding: 14,
     justifyContent: "space-between",
   },
-  moodEmoji: { fontSize: 31 },
+  moodIconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  moodEmoji: { fontSize: 24 },
   moodName: { color: colors.text, fontSize: 13, fontFamily: "Georgia" },
+  colorLine: {
+    height: 3,
+    borderRadius: 2,
+    width: 38,
+  },
   shortcuts: { flexDirection: "row", justifyContent: "space-between" },
   shortcut: {
     width: "48%",
     padding: 17,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 18,
     backgroundColor: colors.surface,
   },
-  shortcutIcon: { color: colors.goldDark, fontSize: 28 },
+  searchShortcut: {
+    borderColor: "#BFE6F2",
+  },
+  favoriteShortcut: {
+    borderColor: "#F2C6D9",
+  },
+  shortcutIcon: { fontSize: 28 },
   shortcutTitle: {
     color: colors.text,
     fontSize: 16,
