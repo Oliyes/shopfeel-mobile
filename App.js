@@ -16,6 +16,8 @@ import FavoritesScreen from "./src/screens/FavoritesScreen";
 import ProductDetailScreen from "./src/screens/ProductDetailScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import SettingsScreen from "./src/screens/SettingsScreen";
+import AboutScreen from "./src/screens/AboutScreen";
+import ReferencesScreen from "./src/screens/ReferencesScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,8 @@ export default function App() {
           <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="About" component={AboutScreen} />
+          <Stack.Screen name="References" component={ReferencesScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
