@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,11 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import { apiRequest } from "../services/api";
 import ProductCard from "../components/ProductCard";
-import { getMoodEmoji } from "../utils/moods";
+import { getMoodEmoji, getMoodColor, getMoodSoftColor } from "../utils/moods";
+import BrandLogo from "../components/BrandLogo";
 import { colors } from "../theme";
 
 export default function RecommendationsScreen({ navigation, route }) {
@@ -18,9 +20,11 @@ export default function RecommendationsScreen({ navigation, route }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadRecommendations();
-  }, [mood?.id]);
+  useFocusEffect(
+    useCallback(() => {
+      loadRecommendations();
+    }, [mood?.id])
+  );
 
   async function loadRecommendations() {
     if (!mood?.id) return;
@@ -36,24 +40,38 @@ export default function RecommendationsScreen({ navigation, route }) {
     }
   }
 
-  return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>‹ Voltar</Text>
-        </TouchableOpacity>
+  const moodColor = getMoodColor(mood);
+  const moodSoft = getMoodSoftColor(mood);
 
-        <Text style={styles.emoji}>{getMoodEmoji(mood?.mood_name)}</Text>
-        <Text style={styles.kicker}>ESCOLHA SHOPFEEL</Text>
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: moodSoft }]}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.top}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={[styles.back, { color: moodColor }]}>‹ Voltar</Text>
+          </TouchableOpacity>
+
+          <BrandLogo size={42} compact />
+        </View>
+
+        <View style={[styles.moodBadge, { backgroundColor: moodColor }]}>
+          <Text style={styles.emoji}>{getMoodEmoji(mood?.mood_name)}</Text>
+        </View>
+
+        <Text style={[styles.kicker, { color: moodColor }]}>ESCOLHA SHOPFEEL</Text>
+
         <Text style={styles.title}>
           Para o seu momento de {mood?.mood_name || "hoje"}
         </Text>
+
         <Text style={styles.subtitle}>
           Selecionamos produtos que combinam com esse humor.
         </Text>
 
+        <View style={[styles.divider, { backgroundColor: moodColor }]} />
+
         {loading ? (
-          <ActivityIndicator color={colors.gold} style={{ marginTop: 50 }} />
+          <ActivityIndicator color={moodColor} style={{ marginTop: 50 }} />
         ) : products.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>
@@ -78,14 +96,16 @@ export default function RecommendationsScreen({ navigation, route }) {
         )}
 
         <TouchableOpacity
-          style={styles.homeButton}
+          style={[styles.homeButton, { borderColor: moodColor }]}
           onPress={() =>
             navigation.navigate("Home", {
               user: route.params?.user,
             })
           }
         >
-          <Text style={styles.homeButtonText}>Ir para o início</Text>
+          <Text style={[styles.homeButtonText, { color: moodColor }]}>
+            Ir para o início
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -93,17 +113,58 @@ export default function RecommendationsScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1 },
   container: { flexGrow: 1, padding: 22, paddingBottom: 35 },
-  back: { color: colors.goldDark, fontSize: 15, marginBottom: 24 },
-  emoji: { fontSize: 42, marginBottom: 12 },
-  kicker: { color: colors.goldDark, fontSize: 10, letterSpacing: 2 },
-  title: { color: colors.text, fontSize: 32, lineHeight: 39, fontFamily: "Georgia", marginTop: 8 },
-  subtitle: { color: colors.muted, marginTop: 9, marginBottom: 24 },
+  top: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 24,
+  },
+  back: { fontSize: 15 },
+  moodBadge: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
+  },
+  emoji: { fontSize: 34 },
+  kicker: { fontSize: 10, letterSpacing: 2, fontWeight: "700" },
+  title: {
+    color: colors.text,
+    fontSize: 32,
+    lineHeight: 39,
+    fontFamily: "Georgia",
+    marginTop: 8,
+  },
+  subtitle: { color: colors.muted, marginTop: 9, marginBottom: 17 },
+  divider: {
+    height: 4,
+    width: 54,
+    borderRadius: 2,
+    marginBottom: 24,
+  },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  empty: { padding: 24, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 18, marginTop: 14 },
+  empty: {
+    padding: 24,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 18,
+    marginTop: 14,
+  },
   emptyTitle: { color: colors.text, fontSize: 18, fontFamily: "Georgia" },
   emptyText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 8 },
-  homeButton: { height: 52, borderWidth: 1, borderColor: colors.gold, borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 12 },
-  homeButtonText: { color: colors.goldDark, fontWeight: "700" },
+  homeButton: {
+    height: 52,
+    borderWidth: 1,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+    backgroundColor: "rgba(255,255,255,0.55)",
+  },
+  homeButtonText: { fontWeight: "700" },
 });
