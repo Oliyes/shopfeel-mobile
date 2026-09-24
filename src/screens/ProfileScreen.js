@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
-import { apiRequest, getApiAssetUrl } from "../services/api";
+import { apiRequest, getApiAssetUrl, uploadProfilePhoto } from "../services/api";
 import BottomNav from "../components/BottomNav";
 import BrandLogo from "../components/BrandLogo";
 import { colors } from "../theme";
@@ -88,20 +88,9 @@ export default function ProfileScreen({ navigation }) {
 
       const asset = result.assets[0];
 
-      const formData = new FormData();
-
-      formData.append("photo", {
-        uri: asset.uri,
-        name: asset.fileName || "shopfeel-profile.jpg",
-        type: asset.mimeType || "image/jpeg",
-      });
-
       setUploadingPhoto(true);
 
-      const data = await apiRequest("/api/me/photo", {
-        method: "POST",
-        body: formData,
-      });
+      const data = await uploadProfilePhoto(asset.uri);
 
       const updatedUser = {
         ...user,
