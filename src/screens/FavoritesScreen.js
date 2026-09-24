@@ -12,6 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { apiRequest } from "../services/api";
 import ProductCard from "../components/ProductCard";
 import BottomNav from "../components/BottomNav";
+import BrandLogo from "../components/BrandLogo";
 import { colors } from "../theme";
 
 export default function FavoritesScreen({ navigation }) {
@@ -54,14 +55,20 @@ export default function FavoritesScreen({ navigation }) {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.page}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.kicker}>SUA SELEÇÃO</Text>
-          <Text style={styles.title}>Favoritos</Text>
+          <View style={styles.header}>
+            <BrandLogo size={45} compact />
+            <View>
+              <Text style={styles.kicker}>SUA SELEÇÃO</Text>
+              <Text style={styles.title}>Favoritos</Text>
+            </View>
+          </View>
+
           <Text style={styles.subtitle}>
             Produtos que você guardou para ver novamente.
           </Text>
 
           {loading ? (
-            <ActivityIndicator color={colors.gold} style={{ marginTop: 50 }} />
+            <ActivityIndicator color="#E768A2" style={{ marginTop: 50 }} />
           ) : products.length === 0 ? (
             <View style={styles.emptyBox}>
               <Text style={styles.emptyEmoji}>♡</Text>
@@ -100,12 +107,21 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   page: { flex: 1 },
   container: { padding: 22, paddingBottom: 20 },
-  kicker: { color: colors.goldDark, fontSize: 10, letterSpacing: 2 },
-  title: { color: colors.text, fontSize: 36, fontFamily: "Georgia", marginTop: 6 },
-  subtitle: { color: colors.muted, marginTop: 7, marginBottom: 24 },
+  header: { flexDirection: "row", alignItems: "center", gap: 12 },
+  kicker: { color: "#E768A2", fontSize: 10, letterSpacing: 2, fontWeight: "700" },
+  title: { color: colors.text, fontSize: 34, fontFamily: "Georgia", marginTop: 2 },
+  subtitle: { color: colors.muted, marginTop: 14, marginBottom: 24 },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  emptyBox: { marginTop: 50, padding: 30, borderWidth: 1, borderColor: colors.border, borderRadius: 20, backgroundColor: colors.surface, alignItems: "center" },
-  emptyEmoji: { fontSize: 42, color: colors.goldDark },
+  emptyBox: {
+    marginTop: 50,
+    padding: 30,
+    borderWidth: 1,
+    borderColor: "#F2C6D9",
+    borderRadius: 20,
+    backgroundColor: "#FFF5F9",
+    alignItems: "center",
+  },
+  emptyEmoji: { fontSize: 42, color: "#E768A2" },
   emptyTitle: { fontSize: 19, fontFamily: "Georgia", color: colors.text, marginTop: 12 },
   emptyText: { textAlign: "center", color: colors.muted, marginTop: 8, lineHeight: 19 },
 });
