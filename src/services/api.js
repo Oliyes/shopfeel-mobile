@@ -6,11 +6,12 @@ const API_URL =
 
 export async function apiRequest(endpoint, options = {}) {
   const token = await AsyncStorage.getItem("shopfeel_token");
+  const isFormData = options.body instanceof FormData;
 
   const response = await fetch(API_URL + endpoint, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: "Bearer " + token } : {}),
       ...options.headers,
     },
@@ -38,6 +39,19 @@ export async function apiRequest(endpoint, options = {}) {
   }
 
   return data;
+}
+
+export function getApiAssetUrl(path) {
+  if (!path) return null;
+
+  if (
+    path.startsWith("http://") ||
+    path.startsWith("https://")
+  ) {
+    return path;
+  }
+
+  return API_URL + path;
 }
 
 export { API_URL };
