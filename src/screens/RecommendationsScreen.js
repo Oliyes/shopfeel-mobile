@@ -13,6 +13,7 @@ import { apiRequest } from "../services/api";
 import ProductCard from "../components/ProductCard";
 import { getMoodEmoji, getMoodColor, getMoodSoftColor } from "../utils/moods";
 import BrandLogo from "../components/BrandLogo";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 export default function RecommendationsScreen({ navigation, route }) {
@@ -68,6 +69,16 @@ export default function RecommendationsScreen({ navigation, route }) {
           Selecionamos produtos que combinam com esse humor.
         </Text>
 
+        <SpeakButton
+          text={
+            "Você escolheu " +
+            (mood?.mood_name || "este humor") +
+            ". Selecionamos produtos que combinam com esse momento."
+          }
+          accentColor={moodColor}
+          label="Ouvir resumo das recomendações"
+        />
+
         <View style={[styles.divider, { backgroundColor: moodColor }]} />
 
         {loading ? (
@@ -119,6 +130,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginTop: 18,
     marginBottom: 24,
   },
   back: { fontSize: 15 },
