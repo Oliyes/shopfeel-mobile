@@ -14,7 +14,7 @@ import { colors } from "../theme";
 const items = [
   { route: "Home", label: "Início", icon: "⌂" },
   { route: "Search", label: "Pesquisar", icon: "⌕" },
-  { route: "Favorites", label: "Favoritos", icon: "♡" },
+  { route: "Favorites", label: "Favoritos", icon: "☆" },
   { route: "Profile", label: "Perfil", icon: "◯" },
 ];
 
