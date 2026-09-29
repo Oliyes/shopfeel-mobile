@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiRequest } from "../services/api";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 function formatPrice(cents) {
@@ -76,7 +77,7 @@ export default function ProductDetailScreen({ navigation, route }) {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={toggleFavorite}>
-            <Text style={styles.heart}>{favorite ? "♥" : "♡"}</Text>
+            <Text style={styles.star}>{favorite ? "★" : "☆"}</Text>
           </TouchableOpacity>
         </View>
 
@@ -103,6 +104,21 @@ export default function ProductDetailScreen({ navigation, route }) {
           {product.description || "Sem descrição cadastrada."}
         </Text>
 
+        <SpeakButton
+          text={
+            "Produto " +
+            product.name +
+            ". Loja " +
+            (product.store_name || "parceira") +
+            ". Preço " +
+            formatPrice(product.price_cents) +
+            ". " +
+            (product.description || "Sem descrição cadastrada.")
+          }
+          accentColor="#9B5DE5"
+          label="Ouvir informações do produto"
+        />
+
         <TouchableOpacity style={styles.button} onPress={openExternal}>
           <Text style={styles.buttonText}>Ver produto na loja</Text>
         </TouchableOpacity>
@@ -120,7 +136,7 @@ const styles = StyleSheet.create({
   container: { padding: 22, paddingBottom: 40 },
   top: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 18 },
   back: { color: colors.goldDark, fontSize: 15 },
-  heart: { fontSize: 30, color: colors.goldDark },
+  star: { fontSize: 32, color: "#F4B942" },
   imageBox: { height: 300, borderRadius: 24, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center", overflow: "hidden" },
   image: { width: "100%", height: "100%" },
   placeholder: { fontSize: 60 },
