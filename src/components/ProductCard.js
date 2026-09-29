@@ -45,7 +45,7 @@ export default function ProductCard({
             onPress={onFavorite}
           >
             <Text style={styles.favoriteIcon}>
-              {favorite ? "♥" : "♡"}
+              {favorite ? "★" : "☆"}
             </Text>
           </TouchableOpacity>
         )}
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   favoriteIcon: {
-    fontSize: 21,
+    fontSize: 24,
     color: colors.goldDark,
   },
   store: {
