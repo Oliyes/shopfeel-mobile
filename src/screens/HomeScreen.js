@@ -15,6 +15,7 @@ import { apiRequest, getApiAssetUrl } from "../services/api";
 import { getMoodEmoji, getMoodColor, getMoodSoftColor } from "../utils/moods";
 import BottomNav from "../components/BottomNav";
 import BrandLogo from "../components/BrandLogo";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 export default function HomeScreen({ route, navigation }) {
@@ -152,6 +153,14 @@ export default function HomeScreen({ route, navigation }) {
             <Text style={styles.heroText}>
               Escolha um humor e descubra produtos selecionados para esse momento.
             </Text>
+
+            <View style={styles.heroAudio}>
+              <SpeakButton
+                text="Bem-vinda ao ShopFeel. Escolha como você está se sentindo hoje para receber recomendações de produtos de acordo com o seu humor."
+                accentColor="#F4B942"
+                label="Ouvir explicação da tela inicial"
+              />
+            </View>
 
             <TouchableOpacity
               style={styles.heroButton}
@@ -434,6 +443,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     marginTop: 10,
+  },
+
+  heroAudio: {
+    marginTop: 16,
   },
 
   heroButton: {
