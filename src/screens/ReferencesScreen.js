@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BrandLogo from "../components/BrandLogo";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 const references = [
@@ -45,6 +46,12 @@ export default function ReferencesScreen({ navigation }) {
           Conceitos usados para organizar a experiência e a identidade visual do aplicativo.
         </Text>
 
+        <SpeakButton
+          text="Esta tela apresenta os fundamentos do ShopFeel: psicologia das cores, experiência do usuário, curadoria de produtos e a observação de que o aplicativo não realiza diagnóstico psicológico."
+          accentColor="#55A86B"
+          label="Ouvir resumo das referências"
+        />
+
         {references.map((item) => (
           <View key={item.title} style={styles.card}>
             <Text style={styles.cardTitle}>{item.title}</Text>
@@ -64,6 +71,7 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 31, lineHeight: 38, fontFamily: "Georgia", marginTop: 6 },
   subtitle: { color: colors.muted, lineHeight: 20, marginTop: 9, marginBottom: 22 },
   card: {
+    marginTop: 14,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
