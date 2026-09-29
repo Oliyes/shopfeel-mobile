@@ -4,7 +4,7 @@ import { File } from "expo-file-system";
 
 const API_URL =
   process.env.EXPO_PUBLIC_API_URL ||
-  "http://192.168.100.137:3000";
+  "http://10.0.2.2:3000";
 
 async function parseResponse(response) {
   if (response.status === 204) {
