@@ -27,6 +27,15 @@ export default function ProductCard({
       style={styles.card}
       activeOpacity={0.85}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={
+        product.name +
+        ", " +
+        formatPrice(product.price_cents) +
+        ", " +
+        (product.store_name || "Loja parceira")
+      }
+      accessibilityHint="Toque para abrir os detalhes do produto."
     >
       <View style={styles.imageBox}>
         {product.image_url ? (
@@ -43,6 +52,13 @@ export default function ProductCard({
           <TouchableOpacity
             style={styles.favoriteButton}
             onPress={onFavorite}
+            accessibilityRole="button"
+            accessibilityLabel={
+              favorite
+                ? "Remover " + product.name + " dos favoritos"
+                : "Adicionar " + product.name + " aos favoritos"
+            }
+            accessibilityHint="Toque para alterar o estado de favorito."
           >
             <Text style={styles.favoriteIcon}>
               {favorite ? "★" : "☆"}
