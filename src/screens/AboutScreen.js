@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BrandLogo from "../components/BrandLogo";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 const steps = [
@@ -39,6 +40,14 @@ export default function AboutScreen({ navigation }) {
           Em vez de começar por uma categoria tradicional, a experiência começa pela forma como a pessoa
           está se sentindo naquele momento.
         </Text>
+
+        <View style={styles.audioWrap}>
+          <SpeakButton
+            text="O ShopFeel é um aplicativo de recomendação de produtos de acordo com o humor do usuário. A experiência começa pela forma como a pessoa está se sentindo e apresenta uma curadoria relacionada ao humor escolhido."
+            accentColor="#9B5DE5"
+            label="Ouvir sobre o ShopFeel"
+          />
+        </View>
 
         <View style={styles.highlight}>
           <Text style={styles.highlightTitle}>O que o ShopFeel faz?</Text>
@@ -149,6 +158,9 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 13,
     lineHeight: 21,
+  },
+  audioWrap: {
+    marginTop: 16,
   },
   highlight: {
     marginTop: 20,
