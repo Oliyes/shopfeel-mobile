@@ -13,6 +13,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { apiRequest } from "../services/api";
 import { getMoodEmoji, getMoodColor, getMoodSoftColor } from "../utils/moods";
 import BrandLogo from "../components/BrandLogo";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 export default function MoodScreen({ navigation, route }) {
@@ -62,6 +63,12 @@ export default function MoodScreen({ navigation, route }) {
         <Text style={styles.subtitle}>
           Cada humor tem sua própria cor e uma curadoria diferente para você.
         </Text>
+
+        <SpeakButton
+          text="Escolha o humor que mais combina com o seu momento. Cada opção possui uma cor e uma curadoria de produtos diferente."
+          accentColor="#9B5DE5"
+          label="Ouvir instruções para escolher o humor"
+        />
 
         {loading ? (
           <ActivityIndicator color="#9B5DE5" style={{ marginTop: 50 }} />
@@ -151,7 +158,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
     marginTop: 12,
-    marginBottom: 28,
+    marginBottom: 18,
   },
   grid: {
     flexDirection: "row",
