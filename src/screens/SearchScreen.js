@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
@@ -18,6 +19,7 @@ import { colors } from "../theme";
 export default function SearchScreen({ navigation }) {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function SearchScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       loadProducts();
+      loadFavorites();
     }, [])
   );
 
@@ -49,12 +52,54 @@ export default function SearchScreen({ navigation }) {
     }
   }
 
+  async function loadFavorites() {
+    try {
+      const data = await apiRequest("/api/me/favorites");
+
+      setFavoriteIds(
+        (data.products || []).map((product) =>
+          Number(product.id)
+        )
+      );
+    } catch {
+      setFavoriteIds([]);
+    }
+  }
+
+  async function toggleFavorite(product) {
+    const id = Number(product.id);
+    const isFavorite = favoriteIds.includes(id);
+
+    try {
+      await apiRequest(
+        "/api/me/favorites/" + id,
+        {
+          method: isFavorite
+            ? "DELETE"
+            : "POST",
+        }
+      );
+
+      setFavoriteIds((current) =>
+        isFavorite
+          ? current.filter((item) => item !== id)
+          : [...current, id]
+      );
+    } catch (error) {
+      Alert.alert(
+        "Favoritos",
+        error.message
+      );
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.page}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.header}>
             <BrandLogo size={45} compact />
+
             <View>
               <Text style={styles.kicker}>DESCUBRA</Text>
               <Text style={styles.title}>Pesquisar</Text>
@@ -67,46 +112,100 @@ export default function SearchScreen({ navigation }) {
             placeholderTextColor={colors.muted}
             value={search}
             onChangeText={setSearch}
+            accessibilityLabel="Pesquisar produtos"
+            accessibilityHint="Digite o nome de um produto."
           />
 
           <Text style={styles.resultLabel}>
-            {search ? "RESULTADOS" : "PRODUTOS DISPONÍVEIS"}
+            {search
+              ? "RESULTADOS"
+              : "PRODUTOS DISPONÍVEIS"}
           </Text>
 
           {loading ? (
-            <ActivityIndicator color="#55B7D9" style={{ marginTop: 40 }} />
+            <ActivityIndicator
+              color="#55B7D9"
+              style={{ marginTop: 40 }}
+            />
           ) : (
             <View style={styles.grid}>
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onPress={() =>
-                    navigation.navigate("ProductDetail", { product })
-                  }
-                />
-              ))}
+              {products.map((product) => {
+                const isFavorite =
+                  favoriteIds.includes(
+                    Number(product.id)
+                  );
+
+                return (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    favorite={isFavorite}
+                    onFavorite={() =>
+                      toggleFavorite(product)
+                    }
+                    onPress={() =>
+                      navigation.navigate(
+                        "ProductDetail",
+                        {
+                          product,
+                          initialFavorite:
+                            isFavorite,
+                        }
+                      )
+                    }
+                  />
+                );
+              })}
             </View>
           )}
 
-          {!loading && products.length === 0 && (
-            <Text style={styles.empty}>Nenhum produto encontrado.</Text>
-          )}
+          {!loading &&
+            products.length === 0 && (
+              <Text style={styles.empty}>
+                Nenhum produto encontrado.
+              </Text>
+            )}
         </ScrollView>
 
-        <BottomNav navigation={navigation} active="Search" />
+        <BottomNav
+          navigation={navigation}
+          active="Search"
+        />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  page: { flex: 1 },
-  container: { padding: 22, paddingBottom: 20 },
-  header: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 20 },
-  kicker: { color: "#55B7D9", fontSize: 10, letterSpacing: 2, fontWeight: "700" },
-  title: { color: colors.text, fontSize: 34, fontFamily: "Georgia", marginTop: 2 },
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  page: {
+    flex: 1,
+  },
+  container: {
+    padding: 22,
+    paddingBottom: 20,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 20,
+  },
+  kicker: {
+    color: "#55B7D9",
+    fontSize: 10,
+    letterSpacing: 2,
+    fontWeight: "700",
+  },
+  title: {
+    color: colors.text,
+    fontSize: 34,
+    fontFamily: "Georgia",
+    marginTop: 2,
+  },
   input: {
     height: 54,
     borderWidth: 1,
@@ -116,7 +215,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     color: colors.text,
   },
-  resultLabel: { marginTop: 26, marginBottom: 14, color: "#397F99", fontSize: 10, letterSpacing: 1.5, fontWeight: "700" },
-  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  empty: { textAlign: "center", color: colors.muted, marginTop: 50 },
+  resultLabel: {
+    marginTop: 26,
+    marginBottom: 14,
+    color: "#397F99",
+    fontSize: 10,
+    letterSpacing: 1.5,
+    fontWeight: "700",
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  empty: {
+    textAlign: "center",
+    color: colors.muted,
+    marginTop: 50,
+  },
 });
