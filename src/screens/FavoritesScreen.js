@@ -71,10 +71,10 @@ export default function FavoritesScreen({ navigation }) {
             <ActivityIndicator color="#E768A2" style={{ marginTop: 50 }} />
           ) : products.length === 0 ? (
             <View style={styles.emptyBox}>
-              <Text style={styles.emptyEmoji}>♡</Text>
+              <Text style={styles.emptyEmoji}>☆</Text>
               <Text style={styles.emptyTitle}>Sua lista está vazia</Text>
               <Text style={styles.emptyText}>
-                Toque no coração de um produto para salvá-lo aqui.
+                Toque na estrela de um produto para salvá-lo aqui.
               </Text>
             </View>
           ) : (
