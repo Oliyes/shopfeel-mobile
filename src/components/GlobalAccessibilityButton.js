@@ -42,6 +42,18 @@ const screenTexts = {
     "Tela de referências e fundamentos. Aqui estão os conceitos utilizados na experiência, nas cores e na curadoria do ShopFeel.",
 };
 
+const screensWithOwnAudio = new Set([
+  "Login",
+  "Register",
+  "ForgotPassword",
+  "Home",
+  "Mood",
+  "Recommendations",
+  "ProductDetail",
+  "About",
+  "References",
+]);
+
 export default function GlobalAccessibilityButton({ routeName }) {
   const [speaking, setSpeaking] = useState(false);
 
@@ -55,6 +67,10 @@ export default function GlobalAccessibilityButton({ routeName }) {
       Speech.stop();
     };
   }, []);
+
+  if (screensWithOwnAudio.has(routeName)) {
+    return null;
+  }
 
   async function handlePress() {
     if (speaking) {
