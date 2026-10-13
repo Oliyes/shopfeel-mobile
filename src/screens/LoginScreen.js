@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiRequest } from "../services/api";
 import BrandLogo from "../components/BrandLogo";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 export default function LoginScreen({ navigation }) {
@@ -82,6 +83,14 @@ export default function LoginScreen({ navigation }) {
             Entre para descobrir produtos que combinam com o seu momento.
           </Text>
 
+          <View style={styles.audioWrap}>
+            <SpeakButton
+              text="Tela de login do ShopFeel. Digite seu e-mail e sua senha para entrar. Se esqueceu sua senha, toque em Esqueci minha senha. Se ainda não possui uma conta, toque em Criar uma conta."
+              accentColor="#9B5DE5"
+              label="Ouvir instruções da tela de login"
+            />
+          </View>
+
           <Text style={styles.label}>E-mail</Text>
           <TextInput
             style={styles.input}
@@ -91,6 +100,7 @@ export default function LoginScreen({ navigation }) {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            accessibilityLabel="E-mail"
           />
 
           <Text style={styles.label}>Senha</Text>
@@ -101,10 +111,13 @@ export default function LoginScreen({ navigation }) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            accessibilityLabel="Senha"
           />
 
           <TouchableOpacity
             onPress={() => navigation.navigate("ForgotPassword")}
+            accessibilityRole="button"
+            accessibilityLabel="Esqueci minha senha"
           >
             <Text style={styles.forgot}>Esqueci minha senha</Text>
           </TouchableOpacity>
@@ -113,6 +126,8 @@ export default function LoginScreen({ navigation }) {
             style={styles.button}
             onPress={handleLogin}
             disabled={loading}
+            accessibilityRole="button"
+            accessibilityLabel="Entrar"
           >
             {loading ? (
               <ActivityIndicator color={colors.white} />
@@ -124,6 +139,8 @@ export default function LoginScreen({ navigation }) {
           <TouchableOpacity
             style={styles.createButton}
             onPress={() => navigation.navigate("Register")}
+            accessibilityRole="button"
+            accessibilityLabel="Criar uma conta"
           >
             <Text style={styles.createText}>Criar uma conta</Text>
           </TouchableOpacity>
@@ -164,8 +181,11 @@ const styles = StyleSheet.create({
   subtitle: {
     color: colors.muted,
     marginTop: 8,
-    marginBottom: 26,
+    marginBottom: 14,
     lineHeight: 20,
+  },
+  audioWrap: {
+    marginBottom: 22,
   },
   label: {
     color: colors.text,
