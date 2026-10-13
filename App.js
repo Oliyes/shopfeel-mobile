@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
@@ -19,15 +19,42 @@ import SettingsScreen from "./src/screens/SettingsScreen";
 import AboutScreen from "./src/screens/AboutScreen";
 import ReferencesScreen from "./src/screens/ReferencesScreen";
 import PreferencesScreen from "./src/screens/PreferencesScreen";
+import GlobalAccessibilityButton from "./src/components/GlobalAccessibilityButton";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [currentRoute, setCurrentRoute] = useState("Splash");
+
   return (
     <>
       <StatusBar style="dark" />
 
-      <NavigationContainer>
+      <NavigationContainer
+        onReady={(navigation) => {
+          const route = navigation?.getCurrentRoute?.();
+          if (route?.name) {
+            setCurrentRoute(route.name);
+          }
+        }}
+        onStateChange={(state) => {
+          if (!state) return;
+
+          const route = state.routes[state.index];
+          let activeRoute = route;
+
+          while (activeRoute?.state) {
+            activeRoute =
+              activeRoute.state.routes[
+                activeRoute.state.index
+              ];
+          }
+
+          if (activeRoute?.name) {
+            setCurrentRoute(activeRoute.name);
+          }
+        }}
+      >
         <Stack.Navigator
           initialRouteName="Splash"
           screenOptions={{
@@ -52,6 +79,10 @@ export default function App() {
           <Stack.Screen name="References" component={ReferencesScreen} />
           <Stack.Screen name="Preferences" component={PreferencesScreen} />
         </Stack.Navigator>
+
+        <GlobalAccessibilityButton
+          routeName={currentRoute}
+        />
       </NavigationContainer>
     </>
   );
