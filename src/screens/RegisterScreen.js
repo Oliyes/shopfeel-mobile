@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiRequest } from "../services/api";
 import BrandLogo from "../components/BrandLogo";
+import SpeakButton from "../components/SpeakButton";
 import { colors } from "../theme";
 
 export default function RegisterScreen({ navigation }) {
@@ -75,7 +76,11 @@ export default function RegisterScreen({ navigation }) {
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
+          >
             <Text style={styles.back}>‹ Voltar</Text>
           </TouchableOpacity>
 
@@ -92,6 +97,14 @@ export default function RegisterScreen({ navigation }) {
             Descubra produtos que combinam com o seu momento.
           </Text>
 
+          <View style={styles.audioWrap}>
+            <SpeakButton
+              text="Tela de criação de conta do ShopFeel. Preencha seu nome, e-mail, crie uma senha com pelo menos oito caracteres e confirme a senha. Depois, toque em Criar conta."
+              accentColor="#55A86B"
+              label="Ouvir instruções para criar uma conta"
+            />
+          </View>
+
           <Text style={styles.label}>Nome</Text>
           <TextInput
             style={styles.input}
@@ -99,6 +112,7 @@ export default function RegisterScreen({ navigation }) {
             placeholderTextColor={colors.muted}
             value={name}
             onChangeText={setName}
+            accessibilityLabel="Nome"
           />
 
           <Text style={styles.label}>E-mail</Text>
@@ -110,6 +124,7 @@ export default function RegisterScreen({ navigation }) {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            accessibilityLabel="E-mail"
           />
 
           <Text style={styles.label}>Senha</Text>
@@ -120,6 +135,7 @@ export default function RegisterScreen({ navigation }) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            accessibilityLabel="Senha"
           />
 
           <Text style={styles.label}>Confirmar senha</Text>
@@ -130,12 +146,15 @@ export default function RegisterScreen({ navigation }) {
             value={confirm}
             onChangeText={setConfirm}
             secureTextEntry
+            accessibilityLabel="Confirmar senha"
           />
 
           <TouchableOpacity
             style={styles.button}
             onPress={handleRegister}
             disabled={loading}
+            accessibilityRole="button"
+            accessibilityLabel="Criar conta"
           >
             {loading ? (
               <ActivityIndicator color={colors.white} />
@@ -144,7 +163,11 @@ export default function RegisterScreen({ navigation }) {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Login")}
+            accessibilityRole="button"
+            accessibilityLabel="Entrar em uma conta existente"
+          >
             <Text style={styles.loginText}>
               Já possui uma conta? <Text style={styles.link}>Entrar</Text>
             </Text>
@@ -176,7 +199,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   title: { color: colors.text, fontSize: 35, fontFamily: "Georgia", marginBottom: 8 },
-  subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginBottom: 28 },
+  subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginBottom: 14 },
+  audioWrap: { marginBottom: 20 },
   label: { color: colors.text, fontSize: 12, marginBottom: 7, marginTop: 4 },
   input: {
     height: 54,
