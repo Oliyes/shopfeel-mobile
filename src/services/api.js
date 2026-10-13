@@ -2,9 +2,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetch as expoFetch } from "expo/fetch";
 import { File } from "expo-file-system";
 
-const API_URL =
+const API_URL = (
   process.env.EXPO_PUBLIC_API_URL ||
-  "http://10.0.2.2:3000";
+  "http://10.0.2.2:3000"
+).replace(/\/$/, "");
+
+const REQUEST_TIMEOUT_MS = 12000;
+
+console.log("[ShopFeel] API:", API_URL);
 
 async function parseResponse(response) {
   if (response.status === 204) {
@@ -24,17 +29,45 @@ async function parseResponse(response) {
 
   if (!response.ok) {
     throw new Error(
-      data?.error || "Erro ao conectar com o servidor"
+      data?.error ||
+        data?.message ||
+        `Erro ${response.status} ao conectar com o servidor.`
     );
   }
 
   return data;
 }
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = REQUEST_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
+
+  try {
+    return await expoFetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error(
+        "O servidor demorou para responder. Verifique se o computador e o celular estão na mesma rede e tente novamente."
+      );
+    }
+
+    throw new Error(
+      "Não foi possível conectar ao servidor do ShopFeel. Confira a conexão com o backend e tente novamente."
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function apiRequest(endpoint, options = {}) {
   const token = await AsyncStorage.getItem("shopfeel_token");
 
-  const response = await fetch(API_URL + endpoint, {
+  const response = await fetchWithTimeout(API_URL + endpoint, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -42,6 +75,16 @@ export async function apiRequest(endpoint, options = {}) {
       ...options.headers,
     },
   });
+
+  return parseResponse(response);
+}
+
+export async function checkApiConnection() {
+  const response = await fetchWithTimeout(
+    API_URL + "/health",
+    { method: "GET" },
+    6000
+  );
 
   return parseResponse(response);
 }
@@ -58,7 +101,7 @@ export async function uploadProfilePhoto(fileUri) {
 
   formData.append("photo", file);
 
-  const response = await expoFetch(
+  const response = await fetchWithTimeout(
     API_URL + "/api/me/photo",
     {
       method: "POST",
@@ -66,7 +109,8 @@ export async function uploadProfilePhoto(fileUri) {
         Authorization: "Bearer " + token,
       },
       body: formData,
-    }
+    },
+    30000
   );
 
   return parseResponse(response);
