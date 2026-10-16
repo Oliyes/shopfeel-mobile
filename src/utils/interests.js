@@ -129,6 +129,14 @@ export function matchesProductInterests(product, selectedInterests) {
     .filter(Boolean)
     .map(normalizeText);
 
+  const normalizedInterests = interests.map(normalizeText);
+
+  if (explicitCategories.length > 0) {
+    return explicitCategories.some((category) =>
+      normalizedInterests.includes(category)
+    );
+  }
+
   const searchableText = normalizeText(
     [
       product?.name,
@@ -140,12 +148,6 @@ export function matchesProductInterests(product, selectedInterests) {
   );
 
   return interests.some((interest) => {
-    const normalizedInterest = normalizeText(interest);
-
-    if (explicitCategories.includes(normalizedInterest)) {
-      return true;
-    }
-
     const keywords = INTEREST_KEYWORDS[interest] || [interest];
 
     return keywords.some((keyword) =>
