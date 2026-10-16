@@ -18,6 +18,14 @@ const interests = [
   ["🏠", "Casa", "#F4B942"],
   ["📚", "Livros", "#55A86B"],
   ["🎮", "Games", "#5B7FC7"],
+  ["🎨", "Arte & Criatividade", "#A867D8"],
+  ["✏️", "Papelaria & Escrita", "#C88B5A"],
+  ["🗂️", "Organização", "#6D9E7B"],
+  ["🧺", "Lazer & Passeios", "#E49A45"],
+  ["😌", "Bem-estar & Relaxamento", "#6FA8C9"],
+  ["🌱", "Natureza & Plantas", "#66A66B"],
+  ["📷", "Fotografia & Memórias", "#8A78B8"],
+  ["🎁", "Presentes & Afeto", "#D9779E"],
 ];
 
 export default function PersonalizationScreen({ navigation, route }) {
@@ -56,7 +64,7 @@ export default function PersonalizationScreen({ navigation, route }) {
 
         <Text style={styles.title}>Vamos deixar o ShopFeel com a sua cara.</Text>
         <Text style={styles.subtitle}>
-          Escolha alguns assuntos que você gosta.
+          Escolha os assuntos que mais combinam com você. Eles serão usados para personalizar as recomendações.
         </Text>
 
         <View style={styles.grid}>
@@ -123,7 +131,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   emoji: { fontSize: 29 },
-  cardText: { color: colors.text, fontSize: 15, fontFamily: "Georgia" },
+  cardText: { color: colors.text, fontSize: 13, lineHeight: 17, fontFamily: "Georgia" },
   button: {
     height: 56,
     backgroundColor: "#9B5DE5",
