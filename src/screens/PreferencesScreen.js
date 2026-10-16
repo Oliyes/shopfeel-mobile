@@ -21,6 +21,14 @@ const interests = [
   ["🏠", "Casa", "#F4C542"],
   ["📚", "Livros", "#55A86B"],
   ["🎮", "Games", "#5B7FC7"],
+  ["🎨", "Arte & Criatividade", "#A867D8"],
+  ["✏️", "Papelaria & Escrita", "#C88B5A"],
+  ["🗂️", "Organização", "#6D9E7B"],
+  ["🧺", "Lazer & Passeios", "#E49A45"],
+  ["😌", "Bem-estar & Relaxamento", "#6FA8C9"],
+  ["🌱", "Natureza & Plantas", "#66A66B"],
+  ["📷", "Fotografia & Memórias", "#8A78B8"],
+  ["🎁", "Presentes & Afeto", "#D9779E"],
 ];
 
 export default function PreferencesScreen({ navigation }) {
@@ -36,24 +44,14 @@ export default function PreferencesScreen({ navigation }) {
   );
 
   async function loadPreferences() {
-    const [
-      savedInterests,
-      savedStartScreen,
-      savedDescriptions,
-    ] = await Promise.all([
+    const [savedInterests, savedStartScreen, savedDescriptions] = await Promise.all([
       AsyncStorage.getItem("shopfeel_interests"),
       AsyncStorage.getItem("shopfeel_start_screen"),
       AsyncStorage.getItem("shopfeel_show_mood_descriptions"),
     ]);
 
-    if (savedInterests) {
-      setSelected(JSON.parse(savedInterests));
-    }
-
-    if (savedStartScreen) {
-      setStartScreen(savedStartScreen);
-    }
-
+    if (savedInterests) setSelected(JSON.parse(savedInterests));
+    if (savedStartScreen) setStartScreen(savedStartScreen);
     if (savedDescriptions !== null) {
       setShowDescriptions(savedDescriptions === "true");
     }
@@ -72,14 +70,8 @@ export default function PreferencesScreen({ navigation }) {
 
   async function savePreferences() {
     await Promise.all([
-      AsyncStorage.setItem(
-        "shopfeel_interests",
-        JSON.stringify(selected)
-      ),
-      AsyncStorage.setItem(
-        "shopfeel_start_screen",
-        startScreen
-      ),
+      AsyncStorage.setItem("shopfeel_interests", JSON.stringify(selected)),
+      AsyncStorage.setItem("shopfeel_start_screen", startScreen),
       AsyncStorage.setItem(
         "shopfeel_show_mood_descriptions",
         String(showDescriptions)
@@ -121,7 +113,7 @@ export default function PreferencesScreen({ navigation }) {
 
         <Text style={styles.sectionTitle}>Seus interesses</Text>
         <Text style={styles.sectionText}>
-          Você pode atualizar os temas escolhidos no primeiro acesso.
+          Escolha tudo o que combina com você. Isso ajuda o ShopFeel a filtrar os produtos dentro de cada humor.
         </Text>
 
         <View style={styles.grid}>
@@ -212,31 +204,18 @@ export default function PreferencesScreen({ navigation }) {
               setShowDescriptions(value);
               setSaved(false);
             }}
-            trackColor={{
-              false: "#D9D9D9",
-              true: "#D8C4EF",
-            }}
-            thumbColor={
-              showDescriptions
-                ? "#9B5DE5"
-                : "#F3F3F3"
-            }
+            trackColor={{ false: "#D9D9D9", true: "#D8C4EF" }}
+            thumbColor={showDescriptions ? "#9B5DE5" : "#F3F3F3"}
           />
         </View>
 
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={savePreferences}
-        >
+        <TouchableOpacity style={styles.saveButton} onPress={savePreferences}>
           <Text style={styles.saveButtonText}>
             {saved ? "Preferências salvas ✓" : "Salvar preferências"}
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.resetButton}
-          onPress={restoreDefaults}
-        >
+        <TouchableOpacity style={styles.resetButton} onPress={restoreDefaults}>
           <Text style={styles.resetText}>Restaurar padrão</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -285,7 +264,7 @@ const styles = StyleSheet.create({
   },
   interestCard: {
     width: "48%",
-    height: 76,
+    minHeight: 88,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
@@ -297,9 +276,11 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 21 },
   interestText: {
     color: colors.text,
-    fontSize: 13,
+    fontSize: 12,
+    lineHeight: 16,
     fontFamily: "Georgia",
     marginTop: 5,
+    paddingRight: 15,
   },
   check: {
     position: "absolute",
@@ -329,10 +310,7 @@ const styles = StyleSheet.create({
     borderColor: "#9B5DE5",
     backgroundColor: "#F5EEFB",
   },
-  choiceIcon: {
-    fontSize: 25,
-    color: "#9B5DE5",
-  },
+  choiceIcon: { fontSize: 25, color: "#9B5DE5" },
   choiceTitle: {
     marginTop: 10,
     color: colors.text,
@@ -359,18 +337,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 28,
   },
-  saveButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-  },
+  saveButtonText: { color: "#FFFFFF", fontWeight: "700" },
   resetButton: {
     height: 48,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 6,
   },
-  resetText: {
-    color: colors.muted,
-    fontSize: 12,
-  },
+  resetText: { color: colors.muted, fontSize: 12 },
 });
