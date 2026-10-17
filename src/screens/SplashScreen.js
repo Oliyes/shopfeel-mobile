@@ -2,15 +2,37 @@ import React, { useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BrandLogo from "../components/BrandLogo";
+import { apiRequest } from "../services/api";
 import { colors } from "../theme";
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      const token = await AsyncStorage.getItem("shopfeel_token");
-      const savedUser = await AsyncStorage.getItem("shopfeel_user");
+    let active = true;
 
-      if (token && savedUser) {
+    const timer = setTimeout(async () => {
+      try {
+        const token = await AsyncStorage.getItem("shopfeel_token");
+        const savedUser = await AsyncStorage.getItem("shopfeel_user");
+
+        if (!token || !savedUser) {
+          if (active) navigation.replace("Login");
+          return;
+        }
+
+        // Confirma com o backend se a sessão salva ainda é válida.
+        // Se o JWT tiver expirado, o usuário volta ao login sem tela vermelha.
+        const profileData = await apiRequest("/api/me");
+        const currentUser = profileData?.customer;
+
+        if (!currentUser) {
+          throw new Error("Sessão inválida");
+        }
+
+        await AsyncStorage.setItem(
+          "shopfeel_user",
+          JSON.stringify(currentUser)
+        );
+
         const savedStartScreen =
           await AsyncStorage.getItem("shopfeel_start_screen");
 
@@ -19,15 +41,27 @@ export default function SplashScreen({ navigation }) {
             ? "Mood"
             : "Home";
 
-        navigation.replace(startScreen, {
-          user: JSON.parse(savedUser),
-        });
-      } else {
-        navigation.replace("Login");
+        if (active) {
+          navigation.replace(startScreen, {
+            user: currentUser,
+          });
+        }
+      } catch {
+        await Promise.all([
+          AsyncStorage.removeItem("shopfeel_token"),
+          AsyncStorage.removeItem("shopfeel_user"),
+        ]);
+
+        if (active) {
+          navigation.replace("Login");
+        }
       }
     }, 1300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [navigation]);
 
   return (
