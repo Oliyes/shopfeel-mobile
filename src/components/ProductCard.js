@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { colors } from "../theme";
+import { getCategoryMeta } from "../utils/categories";
 
 function formatPrice(cents) {
   const value = (Number(cents) || 0) / 100;
@@ -22,6 +23,8 @@ export default function ProductCard({
   onFavorite,
   favorite = false,
 }) {
+  const category = getCategoryMeta(product.interest_category);
+
   return (
     <TouchableOpacity
       style={styles.card}
@@ -31,6 +34,7 @@ export default function ProductCard({
       accessibilityLabel={
         product.name +
         ", " +
+        (category ? category.label + ", " : "") +
         formatPrice(product.price_cents) +
         ", " +
         (product.store_name || "Loja parceira")
@@ -66,6 +70,14 @@ export default function ProductCard({
           </TouchableOpacity>
         )}
       </View>
+
+      {category && (
+        <View style={styles.categoryBadge}>
+          <Text style={styles.categoryText} numberOfLines={1}>
+            {category.emoji} {category.label}
+          </Text>
+        </View>
+      )}
 
       <Text style={styles.store} numberOfLines={1}>
         {product.store_name || "Loja parceira"}
@@ -122,6 +134,20 @@ const styles = StyleSheet.create({
   favoriteIcon: {
     fontSize: 24,
     color: colors.goldDark,
+  },
+  categoryBadge: {
+    alignSelf: "flex-start",
+    maxWidth: "100%",
+    backgroundColor: colors.surfaceSoft,
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    marginBottom: 7,
+  },
+  categoryText: {
+    fontSize: 9,
+    color: colors.muted,
+    fontWeight: "700",
   },
   store: {
     fontSize: 10,
