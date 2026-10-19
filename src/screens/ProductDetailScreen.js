@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiRequest } from "../services/api";
 import SpeakButton from "../components/SpeakButton";
+import { getCategoryMeta } from "../utils/categories";
 import { colors } from "../theme";
 
 function formatPrice(cents) {
@@ -34,6 +35,8 @@ export default function ProductDetailScreen({ navigation, route }) {
       </SafeAreaView>
     );
   }
+
+  const category = getCategoryMeta(product.interest_category);
 
   async function openExternal() {
     if (!product.external_url) {
@@ -94,6 +97,15 @@ export default function ProductDetailScreen({ navigation, route }) {
         </View>
 
         <Text style={styles.store}>{product.store_name || "LOJA PARCEIRA"}</Text>
+
+        {category && (
+          <View style={styles.categoryBadge}>
+            <Text style={styles.categoryText}>
+              {category.emoji} {category.label}
+            </Text>
+          </View>
+        )}
+
         <Text style={styles.title}>{product.name}</Text>
         <Text style={styles.price}>{formatPrice(product.price_cents)}</Text>
 
@@ -108,6 +120,8 @@ export default function ProductDetailScreen({ navigation, route }) {
           text={
             "Produto " +
             product.name +
+            ". Categoria " +
+            (category?.label || "não informada") +
             ". Loja " +
             (product.store_name || "parceira") +
             ". Preço " +
@@ -141,7 +155,9 @@ const styles = StyleSheet.create({
   image: { width: "100%", height: "100%" },
   placeholder: { fontSize: 60 },
   store: { marginTop: 23, color: colors.goldDark, fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase" },
-  title: { marginTop: 8, fontSize: 29, lineHeight: 36, color: colors.text, fontFamily: "Georgia" },
+  categoryBadge: { alignSelf: "flex-start", backgroundColor: colors.surfaceSoft, borderRadius: 999, paddingHorizontal: 11, paddingVertical: 7, marginTop: 10 },
+  categoryText: { color: colors.muted, fontSize: 11, fontWeight: "700" },
+  title: { marginTop: 10, fontSize: 29, lineHeight: 36, color: colors.text, fontFamily: "Georgia" },
   price: { marginTop: 12, fontSize: 21, fontWeight: "700", color: colors.text },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 24 },
   section: { color: colors.goldDark, fontSize: 10, letterSpacing: 1.5 },
