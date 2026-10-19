@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,10 +15,12 @@ import { apiRequest } from "../services/api";
 import ProductCard from "../components/ProductCard";
 import BottomNav from "../components/BottomNav";
 import BrandLogo from "../components/BrandLogo";
+import { PRODUCT_CATEGORIES } from "../utils/categories";
 import { colors } from "../theme";
 
 export default function SearchScreen({ navigation }) {
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [products, setProducts] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +28,7 @@ export default function SearchScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       loadProducts();
-    }, 350);
+    }, 250);
 
     return () => clearTimeout(timer);
   }, [search]);
@@ -41,9 +44,10 @@ export default function SearchScreen({ navigation }) {
     try {
       setLoading(true);
 
+      // Busca até 100 produtos para permitir combinar texto + categoria no app.
       const endpoint = search.trim()
-        ? "/api/mobile/products?search=" + encodeURIComponent(search.trim())
-        : "/api/mobile/products";
+        ? "/api/mobile/products?limit=100&search=" + encodeURIComponent(search.trim())
+        : "/api/mobile/products?limit=100";
 
       const data = await apiRequest(endpoint);
       setProducts(data.products || []);
@@ -57,9 +61,7 @@ export default function SearchScreen({ navigation }) {
       const data = await apiRequest("/api/me/favorites");
 
       setFavoriteIds(
-        (data.products || []).map((product) =>
-          Number(product.id)
-        )
+        (data.products || []).map((product) => Number(product.id))
       );
     } catch {
       setFavoriteIds([]);
@@ -71,14 +73,9 @@ export default function SearchScreen({ navigation }) {
     const isFavorite = favoriteIds.includes(id);
 
     try {
-      await apiRequest(
-        "/api/me/favorites/" + id,
-        {
-          method: isFavorite
-            ? "DELETE"
-            : "POST",
-        }
-      );
+      await apiRequest("/api/me/favorites/" + id, {
+        method: isFavorite ? "DELETE" : "POST",
+      });
 
       setFavoriteIds((current) =>
         isFavorite
@@ -86,12 +83,17 @@ export default function SearchScreen({ navigation }) {
           : [...current, id]
       );
     } catch (error) {
-      Alert.alert(
-        "Favoritos",
-        error.message
-      );
+      Alert.alert("Favoritos", error.message);
     }
   }
+
+  const filteredProducts = useMemo(() => {
+    if (!selectedCategory) return products;
+
+    return products.filter(
+      (product) => product.interest_category === selectedCategory
+    );
+  }, [products, selectedCategory]);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -116,8 +118,64 @@ export default function SearchScreen({ navigation }) {
             accessibilityHint="Digite o nome de um produto."
           />
 
+          <Text style={styles.categoryLabel}>BUSCAR POR CATEGORIA</Text>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryRow}
+          >
+            <TouchableOpacity
+              style={[
+                styles.categoryChip,
+                !selectedCategory && styles.categoryChipActive,
+              ]}
+              onPress={() => setSelectedCategory("")}
+              accessibilityRole="button"
+              accessibilityState={{ selected: !selectedCategory }}
+            >
+              <Text
+                style={[
+                  styles.categoryChipText,
+                  !selectedCategory && styles.categoryChipTextActive,
+                ]}
+              >
+                Todos
+              </Text>
+            </TouchableOpacity>
+
+            {PRODUCT_CATEGORIES.map((category) => {
+              const active = selectedCategory === category.value;
+
+              return (
+                <TouchableOpacity
+                  key={category.value}
+                  style={[
+                    styles.categoryChip,
+                    active && styles.categoryChipActive,
+                  ]}
+                  onPress={() => setSelectedCategory(category.value)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
+                  accessibilityLabel={"Categoria " + category.label}
+                >
+                  <Text
+                    style={[
+                      styles.categoryChipText,
+                      active && styles.categoryChipTextActive,
+                    ]}
+                  >
+                    {category.emoji} {category.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
           <Text style={styles.resultLabel}>
-            {search
+            {selectedCategory
+              ? "PRODUTOS DA CATEGORIA"
+              : search
               ? "RESULTADOS"
               : "PRODUTOS DISPONÍVEIS"}
           </Text>
@@ -129,29 +187,20 @@ export default function SearchScreen({ navigation }) {
             />
           ) : (
             <View style={styles.grid}>
-              {products.map((product) => {
-                const isFavorite =
-                  favoriteIds.includes(
-                    Number(product.id)
-                  );
+              {filteredProducts.map((product) => {
+                const isFavorite = favoriteIds.includes(Number(product.id));
 
                 return (
                   <ProductCard
                     key={product.id}
                     product={product}
                     favorite={isFavorite}
-                    onFavorite={() =>
-                      toggleFavorite(product)
-                    }
+                    onFavorite={() => toggleFavorite(product)}
                     onPress={() =>
-                      navigation.navigate(
-                        "ProductDetail",
-                        {
-                          product,
-                          initialFavorite:
-                            isFavorite,
-                        }
-                      )
+                      navigation.navigate("ProductDetail", {
+                        product,
+                        initialFavorite: isFavorite,
+                      })
                     }
                   />
                 );
@@ -159,18 +208,14 @@ export default function SearchScreen({ navigation }) {
             </View>
           )}
 
-          {!loading &&
-            products.length === 0 && (
-              <Text style={styles.empty}>
-                Nenhum produto encontrado.
-              </Text>
-            )}
+          {!loading && filteredProducts.length === 0 && (
+            <Text style={styles.empty}>
+              Nenhum produto encontrado nessa categoria.
+            </Text>
+          )}
         </ScrollView>
 
-        <BottomNav
-          navigation={navigation}
-          active="Search"
-        />
+        <BottomNav navigation={navigation} active="Search" />
       </View>
     </SafeAreaView>
   );
@@ -214,6 +259,38 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     paddingHorizontal: 16,
     color: colors.text,
+  },
+  categoryLabel: {
+    marginTop: 18,
+    marginBottom: 10,
+    color: "#397F99",
+    fontSize: 10,
+    letterSpacing: 1.4,
+    fontWeight: "700",
+  },
+  categoryRow: {
+    gap: 8,
+    paddingRight: 12,
+  },
+  categoryChip: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: 999,
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+  },
+  categoryChipActive: {
+    backgroundColor: "#DDF3FA",
+    borderColor: "#55B7D9",
+  },
+  categoryChipText: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  categoryChipTextActive: {
+    color: "#2F728A",
   },
   resultLabel: {
     marginTop: 26,
